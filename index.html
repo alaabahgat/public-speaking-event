@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>Public Speaking Workshop — Daily Prep Plan</title>
+<style>
+:root{
+  --bg:#111827; --panel:#1f2937; --panel2:#172033; --text:#f8fafc; --muted:#a9b5c7;
+  --accent:#f5d547; --blue:#45bfff; --line:#314057; --done:#6ee7b7;
+}
+:root.light{
+  --bg:#f5f7fb; --panel:#ffffff; --panel2:#eef3f9; --text:#152033; --muted:#5f6b7b;
+  --accent:#d6a900; --blue:#168bd0; --line:#d7dee9; --done:#168b63;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 20% 0%,rgba(69,191,255,.08),transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}
+.container{width:min(1080px,calc(100% - 28px));margin:auto}
+header{padding:34px 0 22px}
+h1{font-size:clamp(28px,5vw,46px);line-height:1.08;margin:0 0 10px}
+.subtitle{color:var(--muted);font-size:16px;max-width:760px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+button{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+button:hover{transform:translateY(-1px)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:18px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px}
+.stat strong{display:block;font-size:24px}
+.people{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 28px}
+.person{background:var(--panel2);border:1px solid var(--line);padding:9px 12px;border-radius:999px}
+.timeline{position:relative;padding-left:16px}
+.timeline:before{content:"";position:absolute;left:3px;top:0;bottom:0;width:2px;background:var(--line)}
+.day{position:relative;margin:0 0 20px 18px}
+.day:before{content:"";position:absolute;left:-26px;top:26px;width:11px;height:11px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(69,191,255,.13)}
+.card{background:var(--panel);border:2px solid var(--accent);border-radius:20px;padding:20px;box-shadow:0 10px 28px rgba(0,0,0,.12)}
+.meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;color:var(--muted);font-size:14px}
+.badge{background:var(--accent);color:#171717;padding:4px 9px;border-radius:999px;font-weight:800}
+.owner{color:var(--blue);font-weight:800}
+h2{font-family:Georgia,serif;font-size:27px;margin:9px 0 2px}
+.tagline{color:#8fe1ff;font-weight:700;margin:0 0 15px}
+section{margin-top:17px}
+h3{font-family:Georgia,serif;margin:0 0 8px;font-size:18px}
+ul{margin:0;padding:0;list-style:none}
+li{margin:8px 0}
+.task{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.task input{margin-top:5px;width:20px;height:20px;accent-color:var(--done);flex:0 0 auto}
+.task.done span{text-decoration:line-through;opacity:.55}
+.resource{margin-top:13px;padding:11px 13px;background:var(--panel2);border-radius:10px}
+.resource a{color:#55c7ff;font-weight:800}
+.output{margin-top:15px;padding:12px 14px;background:rgba(0,0,0,.18);border-radius:10px;font-weight:800}
+.placeholder{border-color:var(--line)}
+.placeholder .card{border-color:var(--line)}
+footer{padding:30px 0 45px;color:var(--muted);font-size:14px}
+@media(min-width:700px){.stats{grid-template-columns:repeat(3,1fr)}.card{padding:26px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>Public Speaking Workshop: your daily prep plan</h1>
+  <p class="subtitle">Each day has one topic to study, one thing to prepare, and one practice activity. Tick items off as you go; your progress stays on this device.</p>
+  <div class="stats">
+    <div class="stat"><strong id="daysLeft">12</strong>days to the event (20/10)</div>
+    <div class="stat"><strong><span id="doneCount">0</span> of <span id="totalCount">0</span></strong>tasks done</div>
+  </div>
+  <div class="people">
+    <span class="person">الاء · 8/10 to 11/10</span>
+    <span class="person">حبيبه · 12/10 to 14/10</span>
+    <span class="person">جومانه · 15/10 to 17/10</span>
+    <span class="person">جنى · 18/10 to 20/10</span>
+  </div>
+  <div class="toolbar">
+    <button id="themeBtn">Switch light / dark</button>
+    <button id="resetBtn">Reset ticks</button>
+  </div>
+</header>
+
+<main class="timeline" id="timeline"></main>
+
+<footer>
+  Core loop for every activity: short input → speak → feedback → try again.<br>
+  Feedback format: Keep → Change → Try next.
+</footer>
+</div>
+
+<script>
+const days = [
+{date:"Thu 8/10", owner:"الاء", today:true, title:"Foundations and your audience", desc:"What public speaking really is, and who you are speaking to.",
+study:[
+"What public speaking is: intentional speaking to a group, and why content alone is not enough",
+"The assessment domains: structure, language, voice, body language",
+"Audience questions: who are they, what do they know, what do they need, why should they care",
+"The coffee shop test: speak with the clarity of explaining to one person"],
+prepare:["Write a short audience profile for the workshop attendees","Write the workshop goal in one sentence","Draft a first opening line"],
+practice:["30-second introduction (not only name and major)","Audience Switch: explain one idea to two different audiences"],
+resources:["Lawrence Bernstein: the trick to powerful public speaking"],
+output:"Audience profile + one-sentence purpose."},
+
+{date:"Fri 9/10", owner:"الاء", title:"Managing nervousness", desc:"Learn to function well while nervous. The goal is not to remove nerves.",
+study:["Racing heart, dry mouth, shaky voice: arousal, not proof of failure","A short breathing and grounding routine","Gradual exposure: start low-stakes, then raise the difficulty","Focus outward on the audience and the message, not on yourself","Evidence: a meta-analysis of 30 trials found psychological interventions reduce fear of public speaking"],
+prepare:["Build your personal pre-speaking routine","Memorise your first sentence and your core message","Plan how you will run the Nervousness Rehearsal"],
+practice:["Nervousness Rehearsal: 30-second talk right after a grounding routine, then compare"],
+resources:["Mariama Whyte: trust your voice","Lucas Mattiello: speak with confidence","Meta-analysis (PMC)"],
+output:"Your personal pre-speaking routine."},
+
+{date:"Sat 10/10", owner:"الاء", title:"Message and structure", desc:"Turn a broad topic into one message people can follow.",
+study:["One big idea and the through-line that connects every part of the talk","Problem → Cause/Insight → Solution → Takeaway","Situation → Problem → Turning point → Solution → Lesson","What → So what → Now what","Point → Example → Explanation → Takeaway, and Past → Present → Future"],
+prepare:["Reduce the workshop topic to one sentence","Pick one structure and outline a 2 to 4 minute talk with it"],
+practice:["One Idea, One Sentence: reduce a broad topic in two minutes"],
+resources:["TED official guide to public speaking"],
+output:"One-sentence message + a short speech outline."},
+
+{date:"Sun 11/10", owner:"الاء", title:"Storytelling and openings", desc:"Hooks and stories that make an audience care.",
+study:["Opening types: question, story, surprising fact, scenario, contrast, direct statement","Story anatomy: person, situation, problem, change, takeaway","Keep only details that serve the point; end by linking back to the message","Memory tools: repetition, contrast, Rule of Three"],
+prepare:["Write three different openings for your talk","Write a 60-second story with a clear beginning, change, and takeaway"],
+practice:["Hook Challenge: question, story, surprising statement","Story in 60 Seconds"],
+resources:["Jamal French: confidence through storytelling"],
+output:"One strong opening + a 60-second story."},
+
+{date:"Mon 12/10", owner:"حبيبه", title:"Voice and vocal variety", desc:"Volume, pace, pauses, pitch, emphasis, articulation, fillers.", placeholder:true, note:"حبيبه will fill in this day. Source: Doc section D · Activities 6 and 7 · Julian Treasure talk."},
+
+{date:"Tue 13/10", owner:"حبيبه", title:"Body language and presence", desc:"Posture, eye contact, gestures, movement, with the power-pose caveat.", placeholder:true, note:"حبيبه will fill in this day. Source: Doc section E · Activities 8 and 9 · Amy Cuddy talk."},
+
+{date:"Wed 14/10", owner:"حبيبه", title:"Persuasion and rhetoric", desc:"Ethos, logos, pathos, repetition, call to action.", placeholder:true, note:"حبيبه will fill in this day. Source: Doc section H · MLK speech (National Archives)."},
+
+{date:"Thu 15/10", owner:"جومانه", title:"Impromptu speaking", desc:"Thinking on your feet with Point → Reason → Example → Point.", placeholder:true, note:"جومانه will fill in this day. Source: Doc section I · Activity 11."},
+
+{date:"Fri 16/10", owner:"جومانه", title:"Q&A and difficult moments", desc:"Listen, pause, answer directly, admit uncertainty.", placeholder:true, note:"جومانه will fill in this day. Source: Doc section J · Activity 12."},
+
+{date:"Sat 17/10", owner:"جومانه", title:"Mistake recovery and slides", desc:"Pause → breathe → reconnect → continue. Slides only as support (5 to 10% of time).", placeholder:true, note:"جومانه will fill in this day. Source: Doc sections K and L · Activity 13."},
+
+{date:"Sun 18/10", owner:"جنى", title:"Full run-through", desc:"Run the whole workshop flow with timings.", placeholder:true, note:"جنى will fill in this day. Source: Doc section 5 (workshop flow table) · Activities 14 and 15."},
+
+{date:"Mon 19/10", owner:"جنى", title:"Final rehearsal and logistics", desc:"Last practice, materials checklist, feedback forms, rest.", placeholder:true, note:"جنى will fill in this day. Source: Doc sections 6 and 12 (feedback + deliverables)."},
+
+{date:"Tue 20/10", owner:"جنى", title:"Event day", desc:"Warm-up, routine, first sentence, go.", placeholder:true, note:"جنى will fill in this day. Source: Pre-speaking routine from day 2 + final checklist."}
+];
+
+const key = "public-speaking-workshop-checks-v1";
+const saved = JSON.parse(localStorage.getItem(key) || "{}");
+const timeline = document.getElementById("timeline");
+let taskIndex = 0;
+
+function esc(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+
+function taskList(items){
+  return `<ul>${items.map(x=>{
+    const id = "t"+(taskIndex++);
+    const checked = !!saved[id];
+    return `<li><label class="task ${checked?"done":""}"><input type="checkbox" data-id="${id}" ${checked?"checked":""}><span>${esc(x)}</span></label></li>`;
+  }).join("")}</ul>`;
+}
+
+days.forEach((d,i)=>{
+  let body = "";
+  if(d.placeholder){
+    body = `<div class="resource">${esc(d.note)}</div>`;
+  }else{
+    body = `
+      <section><h3>Study</h3>${taskList(d.study)}</section>
+      <section><h3>Prepare</h3>${taskList(d.prepare)}</section>
+      <section><h3>Practice</h3>${taskList(d.practice)}</section>
+      <section><h3>Watch and read</h3><div class="resource">${d.resources.map(r=>`<a href="#" onclick="return false">${esc(r)}</a>`).join("<br>")}</div></section>
+      <div class="output">Output for today: ${esc(d.output)}</div>`;
+  }
+  timeline.insertAdjacentHTML("beforeend",`
+  <article class="day">
+    <div class="card ${d.placeholder?"placeholder":""}">
+      <div class="meta"><span>${esc(d.date)}</span>${d.today?'<span class="badge">Today</span>':''}<span class="owner">${esc(d.owner)}</span></div>
+      <h2>${esc(d.title)}</h2>
+      <p class="tagline">${esc(d.desc)}</p>${body}
+    </div>
+  </article>`);
+});
+
+document.getElementById("totalCount").textContent = taskIndex;
+
+function update(){
+  const boxes = [...document.querySelectorAll('input[type="checkbox"]')];
+  const done = boxes.filter(x=>x.checked).length;
+  document.getElementById("doneCount").textContent = done;
+  boxes.forEach(b=>b.closest(".task").classList.toggle("done",b.checked));
+}
+document.addEventListener("change",e=>{
+  if(e.target.matches('input[type="checkbox"]')){
+    saved[e.target.dataset.id]=e.target.checked;
+    localStorage.setItem(key,JSON.stringify(saved));
+    update();
+  }
+});
+document.getElementById("resetBtn").onclick=()=>{
+  if(confirm("Reset all checked tasks?")){
+    localStorage.removeItem(key);
+    document.querySelectorAll('input[type="checkbox"]').forEach(b=>b.checked=false);
+    update();
+  }
+};
+const theme = localStorage.getItem("theme") || "dark";
+if(theme==="light") document.documentElement.classList.add("light");
+document.getElementById("themeBtn").onclick=()=>{
+  document.documentElement.classList.toggle("light");
+  localStorage.setItem("theme",document.documentElement.classList.contains("light")?"light":"dark");
+};
+update();
+</script>
+</body>
+</html>
